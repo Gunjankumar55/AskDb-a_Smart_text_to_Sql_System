@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="600px" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Database Stack -->
+    <g transform="translate(400, 300)">
+        <!-- Cloud Background -->
+        <path d="M-100,-50 C-80,-80 80,-80 100,-50 C120,-20 120,20 100,50 C80,80 -80,80 -100,50 C-120,20 -120,-20 -100,-50" 
+              fill="#a29bfe" opacity="0.3"/>
+        
+        <!-- Database Cylinders -->
+        <g transform="translate(0, -40)">
+            <ellipse cx="0" cy="0" rx="60" ry="20" fill="#6c5ce7"/>
+            <rect x="-60" y="0" width="120" height="30" fill="#6c5ce7"/>
+            <ellipse cx="0" cy="30" rx="60" ry="20" fill="#6c5ce7"/>
+        </g>
+        
+        <g transform="translate(0, 20)">
+            <ellipse cx="0" cy="0" rx="60" ry="20" fill="#fd79a8"/>
+            <rect x="-60" y="0" width="120" height="30" fill="#fd79a8"/>
+            <ellipse cx="0" cy="30" rx="60" ry="20" fill="#fd79a8"/>
+        </g>
+        
+        <!-- Decorative Elements -->
+        <circle cx="-40" cy="-30" r="5" fill="#fff" opacity="0.5"/>
+        <circle cx="40" cy="50" r="5" fill="#fff" opacity="0.5"/>
+        <circle cx="0" cy="10" r="3" fill="#fff" opacity="0.5"/>
+    </g>
+</svg>

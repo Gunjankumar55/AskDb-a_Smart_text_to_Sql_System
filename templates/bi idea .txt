@@ -1,0 +1,50 @@
+Customer Demographics Dashboard
+- Age distribution of customers
+- Geographic distribution (Map of India showing customer concentration)
+- Customer registration trends over time
+- Top 10 cities by customer count
+- State-wise customer distribution
+- Address type distribution (Home vs Work)
+
+Credit Analysis Dashboard
+- Credit score distribution (Low/Medium/High)
+- Average credit score by city
+- Credit score trends
+- Top customers by credit score
+- Credit status distribution pie chart
+- Correlation between credit score and loan amounts
+
+
+Transaction Insights Dashboard
+- Transaction volume trends
+- Transaction type distribution (Credit vs Debit)
+- Category-wise transaction analysis
+- Top transaction categories
+- Average transaction amount by category
+- Monthly transaction patterns
+- Salary credit trends
+
+Loan Portfolio Dashboard
+- Transaction volume trends
+- Transaction type distribution (Credit vs Debit)
+- Category-wise transaction analysis
+- Top transaction categories
+- Average transaction amount by category
+- Monthly transaction patterns
+- Salary credit trends
+
+Performance Metrics Dashboard
+Key Performance Indicators (KPIs):
+- Total active customers
+- Total loan portfolio value
+- Average credit score
+- Number of delayed loans
+- Total transaction volume
+- Month-over-month growth
+
+Risk Analysis Dashboard
+- Customers with low credit scores and high loans
+- Delayed payment patterns
+- Credit score vs loan amount matrix
+- High-risk geographic areas
+- Transaction patterns of delayed loan customers

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASKDB - Upload & Query</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0d1117;
+            --secondary-dark: #161b22;
+            --accent-blue: #2f81f7;
+            --accent-purple: #7c3aed;
+            --text-primary: #ffffff;
+            --text-secondary: #8b949e;
+            --card-gradient: linear-gradient(145deg, #161b22, #1c2128);
+        }
+        body {
+            background: var(--primary-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-top: 70px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: rgba(13, 17, 23, 0.98);
+            border-bottom: 2px solid rgba(47,129,247,0.2);
+            box-shadow: 0 4px 15px rgba(21, 11, 60, 0.649);
+            padding: 5px;
+            backdrop-filter: blur(10px);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-blue) !important;
+            letter-spacing: 0.5px;
+        }
+        .navbar-logo {
+            width: 60px;
+            height: auto;
+            filter: drop-shadow(0 0 5px rgba(47,129,247,0.5));
+            transition: transform 0.3s;
+        }
+        .navbar-brand:hover .navbar-logo {
+            transform: rotate(5deg);
+        }
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--card-gradient);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.3em;
+        }
+        .file-drop-area {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            width: 100%;
+            max-width: 100%;
+            padding: 2rem;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            transition: 0.3s;
+            background: rgba(0,0,0,0.1);
+            min-height: 200px;
+            cursor: pointer;
+        }
+        .file-drop-area.is-active {
+            background-color: rgba(47,129,247,0.1);
+            border-color: var(--accent-blue);
+        }
+        .file-msg {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(47,129,247,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(47,129,247,0.4);
+        }
+        .btn-outline-primary {
+            border: 2px solid var(--accent-blue);
+            color: var(--accent-blue);
+            background: transparent;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .btn-outline-primary:hover {
+            background: rgba(47,129,247,0.1);
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px rgba(47,129,247,0.2);
+        }
+        .query-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            color: var(--text-primary);
+            padding: 14px 22px;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .query-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(47,129,247,0.3);
+        }
+        .sql-display {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .sql-display pre {
+            color: #b3d4fc;
+            margin-bottom: 0;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 6px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: var(--text-primary);
+        }
+        .table-container {
+            margin-top: 1.5rem;
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .table {
+            color: var(--text-primary);
+            border-color: #30363d;
+            background: transparent;
+        }
+        .table thead th {
+            background: rgba(0,0,0,0.3);
+            border-color: #30363d;
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 1.1em;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .table tbody tr {
+            background: rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+        .table tbody tr:hover {
+            background: rgba(47,129,247,0.1);
+        }
+        .table td {
+            border-color: #30363d;
+            font-size: 1.05em;
+            padding: 0.9rem;
+        }
+        .no-data-msg {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+        .export-btn {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .export-btn:hover {
+            background: rgba(47,129,247,0.1);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+        .suggestion-chip {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 7px 18px;
+            margin: 6px;
+            display: inline-block;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .suggestion-chip:hover {
+            background: rgba(47,129,247,0.1);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+        .voice-btn {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .voice-btn:hover {
+            background: rgba(47,129,247,0.1);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+        .voice-btn.recording {
+            background: rgba(220,38,38,0.2);
+            border-color: #dc2626;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
+            100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+        }
+        .file-icon {
+            font-size: 3rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(47,129,247,0.3);
+        }
+        .success-message, .error-message {
+            margin-top: 1rem;
+            display: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .success-message {
+            color: #bbffbb;
+            background: rgba(76,175,80,0.1);
+            border: 1px solid #4CAF50;
+        }
+        .error-message {
+            color: #ffaaaa;
+            background: rgba(244,67,54,0.1);
+            border: 1px solid #f44336;
+        }
+        .sample-data {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            overflow: auto;
+            max-height: 300px;
+            color: #eee;
+            font-size: 1.05em;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ASKDB Logo" class="navbar-logo">
+                <span class="brand-text">ASKDB</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                   
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/combined">Upload & Query</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-container">
+            <h1 class="mb-4">Upload & Query Your Data</h1>
+            <p class="text-secondary mb-4">Upload your data file and ask questions in natural language - all in one place.</p>
+            
+            <!-- File Upload Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Step 1: Upload Your Data</h4>
+                </div>
+                <div class="card-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="file-drop-area">
+                            <i class="fas fa-cloud-upload-alt file-icon"></i>
+                            <div class="file-msg">Drag & drop your CSV or JSON file here or click to browse</div>
+                            <input class="file-input" type="file" name="file" accept=".csv, .json">
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                                <i class="fas fa-upload me-2"></i>Upload File
+                            </button>
+                        </div>
+                        <div class="success-message" id="successMessage">
+                            <i class="fas fa-check-circle me-2"></i><span id="successText"></span>
+                        </div>
+                        <div class="error-message" id="errorMessage">
+                            <i class="fas fa-exclamation-circle me-2"></i><span id="errorText"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Data Preview Section -->
+            <div class="card mb-4" id="previewCard" style="display: none;">
+                <div class="card-header">
+                    <h4>Data Preview</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge bg-primary" id="recordCount">0 records</span>
+                            <span class="badge bg-secondary ms-2" id="fileType"></span>
+                        </div>
+                    </div>
+                    <div class="sample-data">
+                        <pre id="sampleData">No data available</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Query Section -->
+            <div class="card" id="querySection" style="display: none;">
+                <div class="card-header">
+                    <h4>Step 2: Query Your Data</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Voice Recording Button -->
+                    <div class="mb-3">
+                        <button id="recordBtn" class="btn btn-outline-primary">
+                            <i class="fas fa-microphone me-2"></i>Record Question
+                        </button>
+                        <span class="ms-3 text-secondary" id="recordingStatus"></span>
+                    </div>
+                    
+                    <!-- Query Input -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="queryInput" class="query-input" placeholder="Ask a question about your data...">
+                        <button class="voice-btn ms-2" id="voiceBtn" title="Voice Search">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="btn btn-primary ms-2" id="queryBtn">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                    
+                    <!-- Suggestions -->
+                    <div class="suggestions mb-4" id="suggestions">
+                        <!-- Suggestions will be dynamically inserted here -->
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div id="resultsSection" style="display: none;">
+                        <h5>SQL Query:</h5>
+                        <div class="sql-display">
+                            <pre id="sqlQuery">SELECT * FROM data;</pre>
+                            <button class="copy-btn" id="copyBtn" title="Copy SQL">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="noResultsMsg" class="no-data-msg" style="display: none;">
+                            <i class="fas fa-search me-2"></i>
+                            No results found for your query. Try a different question.
+                        </div>
+                        
+                        <div id="tableContainer">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary" id="resultCount">0 results</span>
+                                <button class="export-btn" id="exportBtn">
+                                    <i class="fas fa-download me-1"></i>Export CSV
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="resultsTable">
+                                    <thead id="resultsHeader">
+                                        <!-- Table headers will be inserted here -->
+                                    </thead>
+                                    <tbody id="resultsBody">
+                                        <!-- Table data will be inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const dropArea = $('.file-drop-area');
+            const fileInput = $('.file-input');
+            const fileMsg = $('.file-msg');
+            const uploadBtn = $('#uploadBtn');
+            const uploadForm = $('#uploadForm');
+            const successMessage = $('#successMessage');
+            const errorMessage = $('#errorMessage');
+            const previewCard = $('#previewCard');
+            const querySection = $('#querySection');
+            const queryInput = $('#queryInput');
+            const queryBtn = $('#queryBtn');
+            const voiceBtn = $('#voiceBtn');
+            const recordBtn = $('#recordBtn');
+            const recordingStatus = $('#recordingStatus');
+            const resultsSection = $('#resultsSection');
+            const sqlQuery = $('#sqlQuery');
+            const copyBtn = $('#copyBtn');
+            const resultsTable = $('#resultsTable');
+            const resultsHeader = $('#resultsHeader');
+            const resultsBody = $('#resultsBody');
+            const resultCount = $('#resultCount');
+            const noResultsMsg = $('#noResultsMsg');
+            const tableContainer = $('#tableContainer');
+            const exportBtn = $('#exportBtn');
+            const suggestions = $('#suggestions');
+            
+            // File selection and drag/drop handling
+            fileInput.on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const fileName = file.name;
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                    fileMsg.text(`Selected: ${fileName} (${fileSize} MB)`);
+                    uploadBtn.prop('disabled', false);
+                    
+                    // Check file extension
+                    const fileExt = fileName.split('.').pop().toLowerCase();
+                    if (fileExt !== 'csv' && fileExt !== 'json') {
+                        errorMessage.show();
+                        $('#errorText').text('Only CSV and JSON files are supported.');
+                        uploadBtn.prop('disabled', true);
+                    } else {
+                        errorMessage.hide();
+                    }
+                }
+            });
+            
+            // Drag and drop styling
+            dropArea.on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('is-active');
+            });
+            
+            dropArea.on('dragleave', function() {
+                $(this).removeClass('is-active');
+            });
+            
+            dropArea.on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('is-active');
+                
+                if (e.originalEvent.dataTransfer.files.length) {
+                    fileInput[0].files = e.originalEvent.dataTransfer.files;
+                    fileInput.trigger('change');
+                }
+            });
+            
+            // Form submission
+            uploadForm.on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                // Show loading state
+                uploadBtn.prop('disabled', true);
+                uploadBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Uploading...');
+                
+                $.ajax({
+                    url: '/api/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success message
+                            successMessage.show();
+                            $('#successText').text(response.message);
+                            errorMessage.hide();
+                            
+                            // Show data preview
+                            previewCard.show();
+                            $('#recordCount').text(`${response.record_count} records`);
+                            
+                            const fileName = fileInput[0].files[0].name;
+                            const fileExt = fileName.split('.').pop().toLowerCase();
+                            $('#fileType').text(fileExt.toUpperCase());
+                            
+                            // Display sample data
+                            if (response.sample && response.sample.length > 0) {
+                                $('#sampleData').text(JSON.stringify(response.sample, null, 2));
+                            } else {
+                                $('#sampleData').text('No sample data available');
+                            }
+                            
+                            // Show query section
+                            querySection.show();
+                            
+                            // Generate suggestions based on columns
+                            if (response.columns && response.columns.length > 0) {
+                                suggestions.empty();
+                                const columns = response.columns;
+                                
+                                // Create some sample suggestions based on columns
+                                suggestions.append(`<span class="suggestion-chip">Show all records</span>`);
+                                if (columns.includes('city') || columns.includes('location')) {
+                                    suggestions.append(`<span class="suggestion-chip">Show records from Mumbai</span>`);
+                                }
+                                if (columns.includes('amount') || columns.includes('price')) {
+                                    suggestions.append(`<span class="suggestion-chip">Find records with amount > 1000</span>`);
+                                }
+                                if (columns.includes('date') || columns.includes('created_at')) {
+                                    suggestions.append(`<span class="suggestion-chip">Show latest 10 records</span>`);
+                                }
+                                suggestions.append(`<span class="suggestion-chip">Count records by ${columns[0]}</span>`);
+                            }
+                            
+                            // Reset upload button
+                            uploadBtn.html('<i class="fas fa-check me-2"></i>Uploaded');
+                            setTimeout(() => {
+                                uploadBtn.html('<i class="fas fa-upload me-2"></i>Upload File');
+                                uploadBtn.prop('disabled', false);
+                            }, 3000);
+                        } else {
+                            // Show error message
+                            errorMessage.show();
+                            $('#errorText').text(response.error);
+                            successMessage.hide();
+                            
+                            // Reset upload button
+                            uploadBtn.html('<i class="fas fa-upload me-2"></i>Upload File');
+                            uploadBtn.prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr) {
+                        // Show error message
+                        errorMessage.show();
+                        $('#errorText').text('Server error. Please try again.');
+                        successMessage.hide();
+                        
+                        // Reset upload button
+                        uploadBtn.html('<i class="fas fa-upload me-2"></i>Upload File');
+                        uploadBtn.prop('disabled', false);
+                    }
+                });
+            });
+            
+            // Handle query submission
+            function submitQuery() {
+                const query = queryInput.val().trim();
+                if (!query) return;
+                
+                // Show loading state
+                queryBtn.prop('disabled', true);
+                queryBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Searching...');
+                resultsSection.hide();
+                
+                $.ajax({
+                    url: '/api/query',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ query: query }),
+                    success: function(response) {
+                        // Reset button state
+                        queryBtn.prop('disabled', false);
+                        queryBtn.html('<i class="fas fa-search me-2"></i>Search');
+                        
+                        // Display SQL query
+                        sqlQuery.text(response.sql_query);
+                        
+                        // Handle results
+                       // Handle results
+if (response.data && response.data.length > 0) {
+    // Show result count
+    resultCount.text(`${response.data.length} results`);
+    
+    // Clear previous results
+    resultsHeader.empty();
+    resultsBody.empty();
+    
+    // Get all unique keys from the data
+    const keys = new Set();
+    response.data.forEach(item => {
+        Object.keys(item).forEach(key => keys.add(key));
+    });
+    const columns = Array.from(keys);
+    
+    // Create table header
+    let headerRow = '<tr>';
+    columns.forEach(column => {
+        headerRow += `<th>${column}</th>`;
+    });
+    headerRow += '</tr>';
+    resultsHeader.append(headerRow);
+    
+    // Create table rows
+    response.data.forEach(item => {
+        let row = '<tr>';
+        columns.forEach(column => {
+            const value = item[column] !== undefined ? item[column] : '';
+            row += `<td>${value}</td>`;
+        });
+        row += '</tr>';
+        resultsBody.append(row);
+    });
+    
+    // Show table, hide no results message
+    tableContainer.show();
+    noResultsMsg.hide();
+} else {
+    // Show no results message, hide table
+    noResultsMsg.show();
+    tableContainer.hide();
+}
+
+// Show results section
+resultsSection.show();
+},
+error: function(xhr) {
+    // Reset button state
+    queryBtn.prop('disabled', false);
+    queryBtn.html('<i class="fas fa-search me-2"></i>Search');
+    
+    // Show error message
+    alert('Error: ' + (xhr.responseJSON?.error || 'Server error. Please try again.'));
+}
+});
+}
+
+// Event listeners
+queryBtn.on('click', submitQuery);
+
+queryInput.on('keypress', function(e) {
+    if (e.which === 13) {
+        submitQuery();
+    }
+});
+
+// Handle suggestion clicks
+$(document).on('click', '.suggestion-chip', function() {
+    const suggestion = $(this).text();
+    queryInput.val(suggestion);
+    submitQuery();
+});
+
+// Copy SQL query to clipboard
+copyBtn.on('click', function() {
+    const textToCopy = sqlQuery.text();
+    navigator.clipboard.writeText(textToCopy).then(function() {
+        // Show copied feedback
+        const originalIcon = copyBtn.html();
+        copyBtn.html('<i class="fas fa-check"></i>');
+        setTimeout(function() {
+            copyBtn.html(originalIcon);
+        }, 1500);
+    });
+});
+
+// Export results as CSV
+exportBtn.on('click', function() {
+    if (resultsBody.find('tr').length === 0) return;
+    
+    // Get headers
+    const headers = [];
+    resultsHeader.find('th').each(function() {
+        headers.push($(this).text());
+    });
+    
+    // Get data rows
+    const rows = [];
+    resultsBody.find('tr').each(function() {
+        const row = [];
+        $(this).find('td').each(function() {
+            // Wrap values with quotes to handle commas in the data
+            row.push(`"${$(this).text().replace(/"/g, '""')}"`);
+        });
+        rows.push(row);
+    });
+    
+    // Create CSV content
+    let csvContent = headers.join(',') + '\n';
+    rows.forEach(function(row) {
+        csvContent += row.join(',') + '\n';
+    });
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'query_results.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
+// Voice search functionality
+if ('webkitSpeechRecognition' in window) {
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onstart = function() {
+        voiceBtn.addClass('recording');
+    };
+    
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        queryInput.val(transcript);
+        setTimeout(submitQuery, 500);
+    };
+    
+    recognition.onend = function() {
+        voiceBtn.removeClass('recording');
+    };
+    
+    recognition.onerror = function(event) {
+        voiceBtn.removeClass('recording');
+        console.error('Speech recognition error', event.error);
+    };
+    
+    voiceBtn.on('click', function() {
+        recognition.start();
+    });
+    
+    // Record button functionality (placeholder)
+    recordBtn.on('click', function() {
+        recordingStatus.text('Recording started...');
+        recordBtn.prop('disabled', true);
+        
+        // This is a mock implementation - in a real app, you'd use the MediaRecorder API
+        setTimeout(function() {
+            recordingStatus.text('Processing audio...');
+            
+            // Simulate processing
+            setTimeout(function() {
+                const mockTranscription = "Show all records";
+                queryInput.val(mockTranscription);
+                recordingStatus.text('Transcribed: ' + mockTranscription);
+                recordBtn.prop('disabled', false);
+            }, 2000);
+        }, 3000);
+    });
+} else {
+    voiceBtn.prop('disabled', true);
+    voiceBtn.attr('title', 'Voice search not supported in this browser');
+    recordBtn.prop('disabled', true);
+    recordBtn.attr('title', 'Voice recording not supported in this browser');
+}
+});
+</script>
+</body>
+</html>
+

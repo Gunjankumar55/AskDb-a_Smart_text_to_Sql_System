@@ -1,0 +1,536 @@
+<!-- Change the tech stack title -->
+
+<!-- Modify the carousel settings -->
+<script>
+    $('.tech-stack-carousel').slick({
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        speed: 1000,
+        arrows: false,
+        pauseOnHover: false
+    });
+</script>
+
+<!-- Remove button shine effect and slow down banner shine -->
+<style>
+    .hero-section::before {
+        animation: shine 5s ease-in-out infinite;
+    }
+    
+    /* Remove the button shine effect */
+    .btn-glow::before {
+        display: none;
+    }
+    
+    /* Increase navbar/banner contrast */
+    .navbar {
+        background: rgba(13, 17, 23, 0.98);
+        border-bottom: 2px solid rgba(47,129,247,0.2);
+    }
+    
+    .hero-section {
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+</style><style>
+    /* Improve text contrast */
+    .query-card, .result-card {
+        color: #ffffff;
+    }
+    .database-title {
+        margin-top: 20px;
+    }
+    /* Glassmorphism for output box */
+    .result-card {
+        background: linear-gradient(145deg, rgba(22, 27, 34, 0.8), rgba(28, 33, 40, 0.8));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Improve column headers visibility */
+    .table th {
+        background: rgba(47,129,247,0.1);
+        color: #ffffff;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(47,129,247,0.3);
+    }
+    
+    /* Example query text */
+    .query-example {
+        color: #c9d1d9;
+    }
+</style>
+
+<!-- Update query example -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Overview - ASKDB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0d1117;
+            --secondary-dark: #161b22;
+            --accent-blue: #2f81f7;
+            --accent-purple: #7c3aed;
+            --text-primary: #ffffff;
+            --text-secondary: #8b949e;
+            --card-gradient: linear-gradient(145deg, #161b22, #1c2128);
+        }
+        body {
+            background: var(--primary-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+        .navbar {
+            background: rgba(13, 17, 23, 0.98);
+            border-bottom: 2px solid rgba(47,129,247,0.2);
+            box-shadow: 0 4px 15px rgba(21, 11, 60, 0.649);
+            padding: 5px;
+        }
+        .navbar-logo {
+        width: 60px; /* Adjust the width as needed */
+        height: auto; /* Maintain aspect ratio */
+    }
+        .database-header {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            padding: 3rem 0;
+    
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        .stats-card {
+            background: linear-gradient(145deg, rgba(22, 27, 34, 0.9), rgba(28, 33, 40, 0.9));
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            height: 100%;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: var(--accent-blue);
+        }
+        .stats-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .table-section {
+            background: rgba(22, 27, 34, 0.8);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .table-card {
+            background: linear-gradient(145deg, rgba(28, 33, 40, 0.9), rgba(22, 27, 34, 0.9));
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .footer {
+            background: var(--secondary-dark);
+            padding: 20px 0;
+            border-top: 1px solid #30363d;
+        }
+        .table-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-blue);
+        }
+        .table-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .table-name i {
+            font-size: 1.2rem;
+        }
+        .column-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .column-item {
+            background: rgba(0,0,0,0.2);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .column-item i {
+            color: var(--accent-blue);
+        }
+        .query-example {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .query-example::before {
+            content: 'Example Query';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--accent-purple);
+            padding: 0.2rem 1rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: white;
+        }
+        .query-text {
+            font-family: 'Fira Code', monospace;
+            color: #e6edf3;
+            margin: 0;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover {
+            background: var(--accent-blue);
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(47,129,247,0.2); }
+            50% { box-shadow: 0 0 20px rgba(47,129,247,0.4); }
+            100% { box-shadow: 0 0 5px rgba(47,129,247,0.2); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ASKDB Logo" class="navbar-logo">
+                <span class="brand-text">ASKDB</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'query' %}active{% endif %}" href="/query">Query</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'database' %}active{% endif %}" href="/database">Database</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <!-- Hero Section -->
+    <div class="database-hero">
+        <div class="container">
+            <h1 class="database-title">Database Overview</h1>
+            <p class="database-subtitle">Explore your database structure and statistics</p>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <!-- Database Stats -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <i class="fas fa-users stats-icon"></i>
+                    <div class="stats-number">100</div>
+                    <div class="stats-label">Total Customers</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <i class="fas fa-table stats-icon"></i>
+                    <div class="stats-number">5</div>
+                    <div class="stats-label">Database Tables</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <i class="fas fa-database stats-icon"></i>
+                    <div class="stats-number">100</div>
+                    <div class="stats-label">Total Transactions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Information -->
+        <div class="table-section">
+            <h2 class="mb-4">Table Structure</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="table-card">
+                        <div class="table-name">
+                            <i class="fas fa-table"></i>
+                            customers
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item">
+                                <i class="fas fa-key" title="Primary Key"></i>
+                                <span>customer_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>first_name</span>
+                                <small class="text-muted">(VARCHAR(50))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>last_name</span>
+                                <small class="text-muted">(VARCHAR(50))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>email</span>
+                                <small class="text-muted">(VARCHAR(100))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>phone</span>
+                                <small class="text-muted">(VARCHAR(20))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>registration_date</span>
+                                <small class="text-muted">(DATE)</small>
+                            </li>
+                        </ul>
+                        <div class="query-example">
+                            <pre class="query-text">Show me all customers from Mumbai</pre>
+                            <button class="copy-btn" onclick="copyQuery(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="table-card">
+                        <div class="table-name">
+                            <i class="fas fa-table"></i>
+                            customer_addresses
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item">
+                                <i class="fas fa-key" title="Primary Key"></i>
+                                <span>address_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>customer_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>address_type</span>
+                                <small class="text-muted">(ENUM)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>street_address</span>
+                                <small class="text-muted">(VARCHAR(255))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>city</span>
+                                <small class="text-muted">(VARCHAR(100))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>state</span>
+                                <small class="text-muted">(VARCHAR(100))</small>
+                            </li>
+                        </ul>
+                        <div class="query-example">
+                            <pre class="query-text">Show me customers whose phone number starts with 98</pre>
+                            <button class="copy-btn" onclick="copyQuery(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="table-card">
+                        <div class="table-name">
+                            <i class="fas fa-table"></i>
+                            credit_scores
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item">
+                                <i class="fas fa-key" title="Primary Key"></i>
+                                <span>score_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>customer_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>credit_score</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>score_status</span>
+                                <small class="text-muted">(ENUM)</small>
+                            </li>
+                        </ul>
+                        <div class="query-example">
+                            <pre class="query-text">Show me customers with high credit scores in descending order</pre>
+                            <button class="copy-btn" onclick="copyQuery(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="table-card">
+                        <div class="table-name">
+                            <i class="fas fa-table"></i>
+                            customer_loans
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item">
+                                <i class="fas fa-key" title="Primary Key"></i>
+                                <span>loan_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>customer_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>principal_amount</span>
+                                <small class="text-muted">(DECIMAL(12,2))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>interest_rate</span>
+                                <small class="text-muted">(DECIMAL(5,2))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>loan_status</span>
+                                <small class="text-muted">(ENUM)</small>
+                            </li>
+                        </ul>
+                        <div class="query-example">
+                            <pre class="query-text">Show me all active loans with amount greater than 1000000</pre>
+                            <button class="copy-btn" onclick="copyQuery(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="table-card">
+                        <div class="table-name">
+                            <i class="fas fa-table"></i>
+                            customer_transactions
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item">
+                                <i class="fas fa-key" title="Primary Key"></i>
+                                <span>transaction_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>customer_id</span>
+                                <small class="text-muted">(INT)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>transaction_date</span>
+                                <small class="text-muted">(DATE)</small>
+                            </li>
+                            <li class="column-item">
+                                <span>amount</span>
+                                <small class="text-muted">(DECIMAL(12,2))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>transaction_type</span>
+                                <small class="text-muted">(ENUM('Credit','Debit'))</small>
+                            </li>
+                            <li class="column-item">
+                                <span>category</span>
+                                <small class="text-muted">(ENUM)</small>
+                            </li>
+                        </ul>
+                        <div class="query-example">
+                            <pre class="query-text">Show me all salary credits above 100000 in the last month</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add margin before footer -->
+        <div style="margin-bottom: 100px;"></div>
+
+        
+
+    <!-- Add margin before footer -->
+    <div style="margin-bottom: 100px;"></div>
+
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyQuery(button) {
+            const queryText = button.parentElement.querySelector('.query-text').textContent;
+            navigator.clipboard.writeText(queryText);
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
