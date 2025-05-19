@@ -26,10 +26,6 @@ AskDB is a powerful tool that converts natural language questions into SQL queri
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.9+
-- Google Gemini API key
-
 ### Installation
 
 1. Clone the repository:
@@ -76,6 +72,4 @@ Try the live demo at [Hugging Face Spaces](https://huggingface.co/spaces/gkc55/A
 
 **Gunjankumar Choudhari** - [GitHub](https://github.com/Gunjankumar55)
 
-## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
