@@ -1,4 +1,4 @@
-# AskDB - Natural Language to SQL Converter
+# AskDB - A smart Natural Language to SQL Converter
 
 ## 🌟 Overview
 
